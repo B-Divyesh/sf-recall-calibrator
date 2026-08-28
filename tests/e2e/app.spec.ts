@@ -1,6 +1,15 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+async function tabToText(page: import('@playwright/test').Page, text: string) {
+  for (let step = 0; step < 20; step += 1) {
+    await page.keyboard.press('Tab');
+    const activeText = await page.evaluate(() => document.activeElement?.textContent?.trim().replace(/\s+/g, ' ') ?? '');
+    if (activeText === text) return;
+  }
+  throw new Error(`Could not reach ${text} with Tab`);
+}
+
 async function openRevealedReview(page: import('@playwright/test').Page) {
   await page.goto('/');
   await page.getByRole('button', { name: 'Load example cards' }).click();
@@ -65,4 +74,59 @@ test('keeps all documented compact-screen targets usable and the sealed label un
   expect(label).not.toBeNull();
   expect(badge).not.toBeNull();
   expect((label?.x ?? 0) + (label?.width ?? 0)).toBeLessThanOrEqual((badge?.x ?? 0) - 8);
+});
+
+test('rejects malformed v1 imports before confirmation and preserves renderable local data', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Load example cards' }).click();
+  await page.getByRole('link', { name: 'Data', exact: true }).click();
+  let confirmationCount = 0;
+  page.on('dialog', async (dialog) => {
+    confirmationCount += 1;
+    await dialog.accept();
+  });
+
+  await page.locator('#import-json').setInputFiles({
+    name: 'malformed-v1.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify({
+      schemaVersion: 1,
+      exportedAt: '2026-08-28T00:00:00.000Z',
+      cards: [{ id: 'broken' }],
+      reviews: [],
+      settings: { sampleSize: 20, normalizedPunctuation: true },
+    })),
+  });
+
+  await expect(page.locator('#import-status')).toContainText('cards[0].prompt must be non-empty text');
+  expect(confirmationCount).toBe(0);
+  await page.getByRole('link', { name: 'Cards', exact: true }).click();
+  await expect(page.getByText('3 total')).toBeVisible();
+  await expect(page.getByText('What is the capital of Japan?')).toBeVisible();
+  await page.reload();
+  await expect(page.getByText('3 total')).toBeVisible();
+  await expect(page.getByText('The local drawer would not open.')).toHaveCount(0);
+});
+
+test('supports the complete 390px review path with keyboard only', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('main')).toBeFocused();
+
+  await tabToText(page, 'Load example cards');
+  await page.keyboard.press('Enter');
+  await tabToText(page, 'Review');
+  await page.keyboard.press('Enter');
+  await tabToText(page, 'Start review');
+  await page.keyboard.press('Enter');
+  await expect(page.getByLabel('What can you retrieve?')).toBeFocused();
+  await page.keyboard.type('Tokyo');
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('button', { name: /Again/ })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('heading', { name: 'Check the registration.' })).toBeVisible();
 });

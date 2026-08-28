@@ -1,7 +1,7 @@
 import './style.css';
-import { db } from './db';
+import { db, validateImportData } from './db';
 import { calibrationSummary, createId, GRADE_SCORES, scoreRecall, suggestedInterval } from './logic';
-import type { AppData, Card, Grade, Review } from './types';
+import type { Card, Grade, Review } from './types';
 
 type Route = 'home' | 'review' | 'cards' | 'insights' | 'settings' | 'privacy' | 'terms';
 type ReviewStage = 'recall' | 'grade' | 'result';
@@ -290,7 +290,7 @@ function bindEvents() {
   });
   document.querySelector<HTMLInputElement>('#import-json')?.addEventListener('change', async (event) => {
     const status = document.querySelector('#import-status')!; const file = (event.currentTarget as HTMLInputElement).files?.[0]; if (!file) return;
-    try { const data = JSON.parse(await file.text()) as AppData; if (!confirm(`Replace local data with ${data.cards?.length ?? 0} cards and ${data.reviews?.length ?? 0} reviews?`)) return; await db.importData(data); await refreshData(); render(); toast('Import complete.'); } catch (error) { status.textContent = error instanceof Error ? error.message : 'Could not read this file.'; }
+    try { const data = validateImportData(JSON.parse(await file.text())); if (!confirm(`Replace local data with ${data.cards.length} cards and ${data.reviews.length} reviews?`)) return; await db.importData(data); await refreshData(); render(); toast('Import complete.'); } catch (error) { status.textContent = error instanceof Error ? error.message : 'Could not read this file. Your current data was not changed.'; }
   });
   document.querySelector('#clear-data')?.addEventListener('click', async () => { if (!confirm(`Delete ${cards.length} cards and ${reviews.length} review samples from this device? This cannot be undone.`)) return; await db.clearAll(); await refreshData(); render(); toast('Local data deleted.'); });
 }
