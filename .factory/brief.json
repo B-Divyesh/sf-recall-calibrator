@@ -1,0 +1,11 @@
+{
+  "slug": "recall-calibrator",
+  "title": "Recall Calibrator",
+  "territory": "utilities",
+  "user": "Spaced-repetition users who distrust their own Good/Hard/Easy judgment and want to know whether they can actually retrieve an answer.",
+  "smallest_useful_product": "A local review companion that samples typed exact/keyword recall before revealing an answer, compares it to the learner's grade, and reports personal calibration with exportable intervals.",
+  "success_measure": "After 200 sampled reviews, at least 60% of pilot users reduce the gap between self-grade and typed-recall result by 20% or more.",
+  "artifact_class": "pwa-offline",
+  "monetization": "free",
+  "constraints": "Use deterministic matching and configurable accepted answers; keep answer text local; clearly label the result as a recall proxy, not a learning diagnosis."
+}
