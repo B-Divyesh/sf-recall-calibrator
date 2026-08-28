@@ -96,13 +96,12 @@ function reviewView(): string {
   if (!card) return `
     <section class="page-head"><p class="eyebrow">Sample complete</p><h1>The ink has settled.</h1><p class="lede">You recorded ${sessionCards.length} new calibration sample${sessionCards.length === 1 ? '' : 's'}.</p><div class="actions"><a class="button primary" href="/insights" data-link>Read your signal</a><button class="button quiet" id="restart-review">Start another sample</button></div></section>`;
   const progress = Math.round(((sessionIndex + (reviewStage === 'result' ? 1 : 0)) / sessionCards.length) * 100);
-  const score = scoreRecall(card, typedRecall);
   return `
     <section class="review-shell">
-      <div class="review-top"><div><p class="eyebrow">Card ${sessionIndex + 1} of ${sessionCards.length}</p><h1>${reviewStage === 'recall' ? 'Make your impression.' : reviewStage === 'grade' ? 'Grade your own recall.' : 'Check the registration.'}</h1></div><div class="progress" aria-label="${progress}% of sample complete"><span style="width:${progress}%"></span></div></div>
+      <div class="review-top"><div><p class="eyebrow">Card ${sessionIndex + 1} of ${sessionCards.length}</p><h1>${reviewStage === 'recall' ? 'Make your impression.' : reviewStage === 'grade' ? 'Grade your own recall.' : 'Check the registration.'}</h1></div><progress class="progress" value="${progress}" max="100" aria-label="${progress}% of sample complete">${progress}%</progress></div>
       <article class="prompt-sheet">
         <p class="sheet-label">Prompt</p><h2>${escapeHtml(card.prompt)}</h2>
-        ${reviewStage === 'recall' ? recallForm(card) : reviewStage === 'grade' ? gradeForm(card, score) : resultView(card)}
+        ${reviewStage === 'recall' ? recallForm(card) : reviewStage === 'grade' ? gradeForm(card) : resultView(card)}
       </article>
       <p class="keyboard-note">Keyboard: <kbd>Tab</kbd> moves · <kbd>Enter</kbd> confirms</p>
     </section>`;
@@ -112,11 +111,11 @@ function recallForm(card: Card): string {
   return `<form id="recall-form" class="recall-form"><label for="typed-recall">What can you retrieve?</label><textarea id="typed-recall" name="recall" rows="4" required autocomplete="off" spellcheck="false" aria-describedby="matching-note">${escapeHtml(typedRecall)}</textarea><p id="matching-note" class="field-note">${card.matchMode === 'exact' ? `Exact mode · ${card.answers.length} accepted answer${card.answers.length === 1 ? '' : 's'}` : `Keyword mode · all ${card.keywords.length} keywords make a match`}</p><button class="button primary" type="submit">Reveal answer</button></form>`;
 }
 
-function gradeForm(card: Card, score: ReturnType<typeof scoreRecall>): string {
+function gradeForm(card: Card): string {
   return `<div class="reveal-block"><p class="sheet-label">Accepted answer</p><p class="answer">${escapeHtml(card.answers[0])}</p>${card.answers.length > 1 ? `<p class="field-note">Also accepted: ${card.answers.slice(1).map(escapeHtml).join(' · ')}</p>` : ''}</div>
     <div class="typed-block"><p class="sheet-label">Your typed recall · proxy sealed</p><p>${escapeHtml(typedRecall)}</p><span class="sealed" aria-label="Recall proxy recorded">Recorded</span></div>
     <fieldset class="grade-field"><legend>Without changing your answer, what would you press in your SRS?</legend><div class="grade-grid">${(['again','hard','good','easy'] as Grade[]).map((grade, index) => `<button type="button" class="grade ${grade}" data-grade="${grade}"><span>${index + 1}</span><b>${grade[0].toUpperCase() + grade.slice(1)}</b><small>${grade === 'again' ? 'No retrieval' : grade === 'hard' ? 'Strained' : grade === 'good' ? 'Solid' : 'Immediate'}</small></button>`).join('')}</div></fieldset>
-    <p class="sr-only">Typed-recall proxy is ${score.label}; it stays hidden until you grade.</p>`;
+    `;
 }
 
 function resultView(card: Card): string {
@@ -160,7 +159,7 @@ function insightsView(): string {
   return `
     <section class="page-head"><p class="eyebrow">Registration report</p><h1>${reviews.length ? 'Read your review signal.' : 'Your signal needs impressions.'}</h1><p class="lede">Calibration is the gap between what you typed and the grade you chose. Smaller gaps mean your scheduler receives a more consistent signal.</p></section>
     ${reviews.length ? `<section class="insight-grid" aria-label="Calibration summary"><div class="score-sheet"><span>Signal alignment</span><strong>${summary.score}<small>/100</small></strong><p>${summary.score >= 80 ? 'Closely registered' : summary.score >= 60 ? 'Some offset remains' : 'Wide offset—keep sampling'}</p></div><div class="bias-sheet"><h2>Your tendency</h2><strong>${Math.abs(summary.bias * 100).toFixed(0)} points ${summary.bias > 0.04 ? 'generous' : summary.bias < -0.04 ? 'harsh' : 'balanced'}</strong><p>${summary.bias > 0.04 ? 'You tend to grade above your typed recall.' : summary.bias < -0.04 ? 'You tend to grade below your typed recall.' : 'Your average grade and recall proxy are close.'}</p></div></section>
-      <section class="report-section"><div class="section-line"><div><p class="eyebrow">All impressions</p><h2>Where your grades land</h2></div><span>${reviews.length} samples</span></div><div class="bar-report" role="img" aria-label="${aligned} aligned, ${generous} generous, and ${harsh} harsh grades"><div><span>Aligned</span><i style="width:${(aligned/reviews.length)*100}%"></i><b>${aligned}</b></div><div><span>Generous</span><i class="red" style="width:${(generous/reviews.length)*100}%"></i><b>${generous}</b></div><div><span>Harsh</span><i class="ochre" style="width:${(harsh/reviews.length)*100}%"></i><b>${harsh}</b></div></div></section>
+      <section class="report-section"><div class="section-line"><div><p class="eyebrow">All impressions</p><h2>Where your grades land</h2></div><span>${reviews.length} samples</span></div><div class="bar-report" role="img" aria-label="${aligned} aligned, ${generous} generous, and ${harsh} harsh grades"><div><span>Aligned</span><progress value="${aligned}" max="${reviews.length}" aria-hidden="true"></progress><b>${aligned}</b></div><div><span>Generous</span><progress class="red" value="${generous}" max="${reviews.length}" aria-hidden="true"></progress><b>${generous}</b></div><div><span>Harsh</span><progress class="ochre" value="${harsh}" max="${reviews.length}" aria-hidden="true"></progress><b>${harsh}</b></div></div></section>
       <section class="report-section"><div class="section-line"><div><p class="eyebrow">Recent record</p><h2>Review history</h2></div>${summary.improvement === null ? `<span>${Math.max(0, 8-reviews.length)} to first trend</span>` : `<span>${summary.improvement >= 0 ? '↓' : '↑'} ${Math.abs(summary.improvement).toFixed(0)}% recent gap</span>`}</div><div class="table-scroll"><table><thead><tr><th>Date</th><th>Prompt</th><th>Typed</th><th>Grade</th><th>Gap</th><th>Interval</th></tr></thead><tbody>${[...reviews].reverse().slice(0,20).map((r) => `<tr><td>${formatDate(r.reviewedAt)}</td><td>${escapeHtml(r.prompt)}</td><td><span class="status ${r.proxyLabel}">${r.proxyLabel}</span></td><td>${r.grade}</td><td>${Math.round(r.gap*100)} pts</td><td>${r.suggestedIntervalDays}d</td></tr>`).join('')}</tbody></table></div></section>` : `<section class="empty-report"><div class="registration-mark" aria-hidden="true">＋</div><h2>No comparisons yet</h2><p>Complete one typed review and self-grade to print your first result here.</p><a class="button primary" href="/review" data-link>${cards.length ? 'Start reviewing' : 'Set up a card'}</a></section>`}
     <p class="disclaimer report-disclaimer">Recall Calibrator reports deterministic response patterns. It does not diagnose memory, mastery, or a learning condition.</p>`;
 }
@@ -317,4 +316,7 @@ window.addEventListener('online', () => showNetworkState(true));
 window.addEventListener('offline', () => showNetworkState(false));
 
 try { await refreshData(); render(); registerServiceWorker(); }
-catch { app.innerHTML = shell('<section class="page-head"><p class="eyebrow">Storage error</p><h1>The local drawer would not open.</h1><p class="lede">Your browser may block IndexedDB in this mode. Allow site storage, then reload.</p><button class="button primary" onclick="location.reload()">Try again</button></section>'); }
+catch {
+  app.innerHTML = shell('<section class="page-head"><p class="eyebrow">Storage error</p><h1>The local drawer would not open.</h1><p class="lede">Your browser may block IndexedDB in this mode. Allow site storage, then reload.</p><button class="button primary" id="storage-retry">Try again</button></section>');
+  document.querySelector('#storage-retry')?.addEventListener('click', () => location.reload());
+}
