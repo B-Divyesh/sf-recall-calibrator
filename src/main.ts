@@ -64,7 +64,7 @@ function homeView(): string {
         <p class="privacy-note"><span aria-hidden="true">◎</span> No account. No cloud. Deterministic matching you can inspect.</p>
       </div>
       <figure class="hero-art">
-        <picture><source media="(max-width: 640px)" srcset="/assets/memory-press-720.webp"><img src="/assets/memory-press.webp" width="1200" height="800" alt="Two offset risograph flashcards, one with a check and one with a question mark, aligned against registration marks" fetchpriority="high" decoding="async"></picture>
+        <picture><source type="image/webp" srcset="/assets/memory-press-720.webp 720w, /assets/memory-press.webp 1200w" sizes="(max-width: 800px) 92vw, 50vw"><img src="/assets/memory-press.jpg" width="1200" height="800" alt="Two offset risograph flashcards, one with a check and one with a question mark, aligned against registration marks" fetchpriority="high" decoding="async"></picture>
         <figcaption>Two impressions. One honest signal.</figcaption>
       </figure>
     </section>
@@ -240,7 +240,21 @@ function download(name: string, content: string, type: string) {
   const anchor = document.createElement('a'); anchor.href = url; anchor.download = name; anchor.click(); URL.revokeObjectURL(url);
 }
 
-function csvCell(value: unknown) { return `"${String(value).replaceAll('"', '""')}"`; }
+function csvCell(value: unknown) {
+  const raw = String(value);
+  const safe = /^[=+\-@]/.test(raw) ? `'${raw}` : raw;
+  return `"${safe.replaceAll('"', '""')}"`;
+}
+
+function showNetworkState(isOnline: boolean) {
+  online = isOnline;
+  const indicator = document.querySelector<HTMLElement>('.network');
+  if (indicator) {
+    indicator.classList.toggle('is-offline', !online);
+    indicator.textContent = online ? 'Local-first' : 'Offline · changes safe';
+  }
+  toast(online ? 'Back online. Local work is unchanged.' : 'You are offline. Reviews still work.');
+}
 
 function bindEvents() {
   document.querySelectorAll<HTMLAnchorElement>('a[data-link]').forEach((link) => link.addEventListener('click', (event) => { if (!event.metaKey && !event.ctrlKey && link.origin === location.origin) { event.preventDefault(); navigate(link.pathname); } }));
@@ -253,7 +267,7 @@ function bindEvents() {
   });
   document.querySelector('#restart-review')?.addEventListener('click', () => { resetSession(); render(); });
   document.querySelector<HTMLFormElement>('#recall-form')?.addEventListener('submit', (event) => {
-    event.preventDefault(); typedRecall = (new FormData(event.currentTarget).get('recall') as string).trim();
+    event.preventDefault(); typedRecall = (new FormData(event.currentTarget as HTMLFormElement).get('recall') as string).trim();
     if (!typedRecall) return; reviewStage = 'grade'; render(); document.querySelector<HTMLButtonElement>('[data-grade]')?.focus();
   });
   document.querySelectorAll<HTMLButtonElement>('[data-grade]').forEach((button) => button.addEventListener('click', () => void saveGrade(button.dataset.grade as Grade)));
@@ -261,7 +275,7 @@ function bindEvents() {
   document.querySelectorAll<HTMLButtonElement>('.delete-card').forEach((button) => button.addEventListener('click', () => void deleteCard(button.dataset.cardId!)));
   document.querySelectorAll<HTMLInputElement>('input[name="matchMode"]').forEach((input) => input.addEventListener('change', () => { const field = document.querySelector<HTMLElement>('#keyword-field')!; field.hidden = input.value !== 'keywords' || !input.checked; }));
   document.querySelector<HTMLFormElement>('#card-form')?.addEventListener('submit', async (event) => {
-    event.preventDefault(); const data = new FormData(event.currentTarget); const now = new Date().toISOString();
+    event.preventDefault(); const data = new FormData(event.currentTarget as HTMLFormElement); const now = new Date().toISOString();
     const prompt = String(data.get('prompt')).trim(); const answers = String(data.get('answers')).split('\n').map((v) => v.trim()).filter(Boolean); const mode = String(data.get('matchMode')) as Card['matchMode']; const keywords = String(data.get('keywords')).split(',').map((v) => v.trim()).filter(Boolean);
     const error = document.querySelector('#card-error')!;
     if (!prompt || !answers.length) { error.textContent = 'Add both a prompt and at least one accepted answer.'; return; }
@@ -276,7 +290,7 @@ function bindEvents() {
     download(`recall-intervals-${new Date().toISOString().slice(0,10)}.csv`, [heads,...rows].map((row) => row.map(csvCell).join(',')).join('\n'), 'text/csv');
   });
   document.querySelector<HTMLInputElement>('#import-json')?.addEventListener('change', async (event) => {
-    const status = document.querySelector('#import-status')!; const file = event.currentTarget.files?.[0]; if (!file) return;
+    const status = document.querySelector('#import-status')!; const file = (event.currentTarget as HTMLInputElement).files?.[0]; if (!file) return;
     try { const data = JSON.parse(await file.text()) as AppData; if (!confirm(`Replace local data with ${data.cards?.length ?? 0} cards and ${data.reviews?.length ?? 0} reviews?`)) return; await db.importData(data); await refreshData(); render(); toast('Import complete.'); } catch (error) { status.textContent = error instanceof Error ? error.message : 'Could not read this file.'; }
   });
   document.querySelector('#clear-data')?.addEventListener('click', async () => { if (!confirm(`Delete ${cards.length} cards and ${reviews.length} review samples from this device? This cannot be undone.`)) return; await db.clearAll(); await refreshData(); render(); toast('Local data deleted.'); });
@@ -299,8 +313,8 @@ function registerServiceWorker() {
 }
 
 window.addEventListener('popstate', () => { route = pathToRoute(location.pathname); resetSession(); render(true); });
-window.addEventListener('online', () => { online = true; render(); toast('Back online. Local work is unchanged.'); });
-window.addEventListener('offline', () => { online = false; render(); toast('You are offline. Reviews still work.'); });
+window.addEventListener('online', () => showNetworkState(true));
+window.addEventListener('offline', () => showNetworkState(false));
 
 try { await refreshData(); render(); registerServiceWorker(); }
 catch { app.innerHTML = shell('<section class="page-head"><p class="eyebrow">Storage error</p><h1>The local drawer would not open.</h1><p class="lede">Your browser may block IndexedDB in this mode. Allow site storage, then reload.</p><button class="button primary" onclick="location.reload()">Try again</button></section>'); }

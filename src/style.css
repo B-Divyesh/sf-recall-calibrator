@@ -49,6 +49,9 @@ nav a[aria-current="page"]::after { content: ""; position: absolute; height: 5px
 .network.is-offline::before { background: var(--ochre); }
 
 main { min-height: 70vh; }
+.boot-state { display: grid; min-height: 100vh; place-items: center; align-content: center; padding: 32px; text-align: center; }
+.boot-state p { color: var(--indigo-dark); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.boot-state h1 { margin: 0; }
 .hero { max-width: 1184px; min-height: 670px; margin: 0 auto; padding: 72px 32px 64px; display: grid; grid-template-columns: .96fr 1.04fr; gap: clamp(36px, 7vw, 96px); align-items: center; }
 .hero-copy { position: relative; z-index: 2; }
 .hero-copy::before { content: ""; position: absolute; width: 72px; height: 14px; background: var(--red); opacity: .85; left: -22px; top: 36px; transform: rotate(-2deg); z-index: -1; }
@@ -181,7 +184,7 @@ footer { max-width: 1120px; margin: 0 auto; padding: 28px 32px 42px; display: fl
 .toast-region { position: fixed; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); z-index: 50; }.toast { display: flex; align-items: center; gap: 18px; max-width: 390px; min-height: 52px; padding: 12px 16px; color: #fff; background: var(--ink); border: 2px solid var(--paper-high); box-shadow: 5px 5px 0 var(--red); }.toast button { min-height: 36px; border: 1px solid #fff; color: #fff; background: transparent; font-weight: 800; cursor: pointer; }
 
 @media (max-width: 800px) {
-  .site-header { grid-template-columns: 1fr auto; padding: 14px 20px; }.network { display: none; }nav { grid-column: 1/-1; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 6px; }nav a { padding: 0 8px; }
+  .site-header { grid-template-columns: 1fr auto; padding: 14px 20px; }.network { font-size: .72rem; }nav { grid-column: 1/-1; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 6px; }nav a { padding: 0 8px; }
   .hero { min-height: 0; grid-template-columns: 1fr; padding: 50px 24px 70px; }.hero-art { max-width: 600px; }.workbench { margin-left: 20px; margin-right: 20px; grid-template-columns: 1fr; padding: 28px; }.metric-strip { margin-top: 20px; }.three-pass { margin: 0 24px 64px; }.three-pass ol { grid-template-columns: 1fr; }.three-pass li { min-height: auto; }
   .card-layout { grid-template-columns: 1fr; gap: 42px; }.card-form { position: static; }.split-head { display: block; }.split-head .button { margin-top: 16px; }
   .review-top { grid-template-columns: 1fr; gap: 0; }.progress { margin-bottom: 24px; }.insight-grid { grid-template-columns: 1fr; }.report-section { margin-left: 32px; margin-right: 32px; }.settings-grid { grid-template-columns: 1fr; }.danger-panel { grid-column: auto; }
