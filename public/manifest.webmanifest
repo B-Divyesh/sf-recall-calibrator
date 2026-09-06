@@ -1,9 +1,9 @@
 {
   "name": "Recall Calibrator",
   "short_name": "Calibrator",
-  "description": "Compare typed recall with your self-grade, privately and offline.",
+  "description": "Compare typed recall with self-grades before using a spaced-repetition scheduler.",
   "id": "/",
-  "start_url": "/?source=installed&v=1",
+  "start_url": "/?source=installed&v=2",
   "scope": "/",
   "display": "standalone",
   "background_color": "#F4EDDC",

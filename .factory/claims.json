@@ -1,0 +1,128 @@
+[
+  {
+    "id": "demo-isolation",
+    "claim": "Sample cards and reviews use separate local storage and never change ordinary local data.",
+    "where": "Demo banner, Privacy page",
+    "test": "npm run test:e2e -- --grep @claim:demo-isolation",
+    "sandbox": "Create an ordinary card, enter /demo, reset sample data, then start for real and assert only the ordinary card remains."
+  },
+  {
+    "id": "privacy-local",
+    "claim": "Cards and reviews remain in browser storage after reload.",
+    "where": "Landing facts, Privacy page, README",
+    "test": "npm run test:e2e -- --grep @claim:privacy-local",
+    "sandbox": "Use /demo, add a card, reload, and assert the card and demo banner remain."
+  },
+  {
+    "id": "no-account-payment",
+    "claim": "Recall Calibrator is free to use without an account or payment.",
+    "where": "Landing facts, Privacy page, Terms page",
+    "test": "npm run test:e2e -- --grep @claim:no-account-payment",
+    "sandbox": "Complete a review from /demo and assert no credential or payment UI is needed."
+  },
+  {
+    "id": "no-remote-store",
+    "claim": "A review sends no request outside the product origin.",
+    "where": "Privacy page, README",
+    "test": "npm run test:e2e -- --grep @claim:no-remote-store",
+    "sandbox": "Record every browser request during a /demo review and assert every origin is the product origin."
+  },
+  {
+    "id": "exact-match",
+    "claim": "Exact matching ignores case, accents, whitespace, and punctuation.",
+    "where": "Cards page, README",
+    "test": "npm run test:e2e -- --grep @claim:exact-match",
+    "sandbox": "Use the /demo HTTP card with punctuation and whitespace changes, then assert Match."
+  },
+  {
+    "id": "keyword-match",
+    "claim": "Required-keyword cards report partial recall when only some required keywords are present.",
+    "where": "Cards page, README",
+    "test": "npm run test:e2e -- --grep @claim:keyword-match",
+    "sandbox": "Create a keyword card in /demo, type one of two keywords, and assert Partial."
+  },
+  {
+    "id": "accepted-answers",
+    "claim": "A card can accept multiple exact answers.",
+    "where": "Cards page, README",
+    "test": "npm run test:e2e -- --grep @claim:accepted-answers",
+    "sandbox": "Create a two-answer card in /demo, type the alternate answer, and assert Match."
+  },
+  {
+    "id": "sealed-proxy",
+    "claim": "The typed-recall result stays sealed until a self-grade is chosen.",
+    "where": "Review screen, README",
+    "test": "npm run test:e2e -- --grep @claim:sealed-proxy",
+    "sandbox": "Reveal a /demo answer, inspect the accessible review state before grading, then assert the result appears after grading."
+  },
+  {
+    "id": "calibration-report",
+    "claim": "Insights report grade alignment and review history.",
+    "where": "Demo, Insights page, README",
+    "test": "npm run test:e2e -- --grep @claim:calibration-report",
+    "sandbox": "Open /demo and assert the populated alignment report and all eight review rows."
+  },
+  {
+    "id": "calibration-tendency",
+    "claim": "Insights report generous or harsh grade tendency and a recent grade-gap trend after eight reviews.",
+    "where": "Demo, Insights page, README",
+    "test": "npm run test:e2e -- --grep @claim:calibration-tendency",
+    "sandbox": "Open /demo and assert the populated tendency and recent-trend output."
+  },
+  {
+    "id": "transparent-interval",
+    "claim": "Each result shows a deterministic suggested interval and the rule used.",
+    "where": "Review result, README",
+    "test": "npm run test:e2e -- --grep @claim:transparent-interval",
+    "sandbox": "Create a 10-day /demo card, produce an exact match, and assert the 25-day result and 2.5× rule."
+  },
+  {
+    "id": "csv-export",
+    "claim": "Review history exports as CSV.",
+    "where": "Data page, README",
+    "test": "npm run test:e2e -- --grep @claim:csv-export",
+    "sandbox": "Download CSV from /demo and assert its header plus one row for each sample review."
+  },
+  {
+    "id": "json-restore",
+    "claim": "A JSON export restores cards and reviews.",
+    "where": "Data page, README",
+    "test": "npm run test:e2e -- --grep @claim:json-restore",
+    "sandbox": "Export /demo JSON, delete the sample data, restore the file, and assert the sample cards return."
+  },
+  {
+    "id": "delete-local-data",
+    "claim": "Local cards and reviews can be deleted explicitly.",
+    "where": "Data page, Privacy page, README",
+    "test": "npm run test:e2e -- --grep @claim:delete-local-data",
+    "sandbox": "Confirm deletion from /demo and assert every sample card is gone."
+  },
+  {
+    "id": "offline-reload",
+    "claim": "The app works offline after the first visit.",
+    "where": "Landing facts, Privacy page, README",
+    "test": "npm run test:e2e -- --grep @claim:offline-reload",
+    "sandbox": "Use a new browser context, visit /demo until service-worker controlled, set it offline, reload, and assert the sample report returns."
+  },
+  {
+    "id": "pwa-install",
+    "claim": "Recall Calibrator is an installable standalone PWA.",
+    "where": "README",
+    "test": "npm run test:e2e -- --grep @claim:pwa-install",
+    "sandbox": "Open /demo, assert service-worker control, then read the live manifest for standalone display and 192/512 icons."
+  },
+  {
+    "id": "keyboard-mobile",
+    "claim": "The review works by keyboard on a 390 px-wide screen.",
+    "where": "README",
+    "test": "npm run test:e2e -- --grep @claim:keyboard-mobile",
+    "sandbox": "At 390 px, use only Tab and Enter from /demo through reveal and grade, then assert the result and no horizontal overflow."
+  },
+  {
+    "id": "reduced-motion",
+    "claim": "Reduced-motion preference removes interface movement.",
+    "where": "README",
+    "test": "npm run test:e2e -- --grep @claim:reduced-motion",
+    "sandbox": "Emulate reduced motion at /demo and assert the visual transform is removed and transitions are effectively instant."
+  }
+]

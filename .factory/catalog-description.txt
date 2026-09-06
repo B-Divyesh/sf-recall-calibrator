@@ -1,0 +1,1 @@
+Compare typed recall with your self-grade before updating your spaced-repetition scheduler.

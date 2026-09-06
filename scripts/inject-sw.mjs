@@ -3,7 +3,7 @@ import { copyFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join, relative } from 'node:path';
 
 const root = new URL('../dist/', import.meta.url);
-for (const route of ['review', 'cards', 'insights', 'settings', 'privacy', 'terms']) {
+for (const route of ['demo', 'review', 'cards', 'insights', 'settings', 'privacy', 'terms']) {
   const directory = join(root.pathname, route);
   await mkdir(directory, { recursive: true });
   await copyFile(join(root.pathname, 'index.html'), join(directory, 'index.html'));

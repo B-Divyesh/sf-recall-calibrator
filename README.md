@@ -1,61 +1,80 @@
 # Recall Calibrator
 
-Recall Calibrator is a private review companion for spaced-repetition users
-who want evidence behind their Again/Hard/Good/Easy choice. It asks for typed
-recall before revealing the answer, scores that response with transparent
-exact or keyword rules, and compares the result with the learner's self-grade.
+Recall Calibrator helps spaced-repetition users compare typed recall with the
+Again, Hard, Good, or Easy grade they would choose. It is for people who want
+a more reliable review signal before updating their scheduler.
 
-It does not replace Anki or another scheduler, and it does not diagnose
-learning. It improves the quality of the signal you choose to send to one.
+[Try it with sample data](https://recall-calibrator.sociobot.in/demo) ·
+[Live app](https://recall-calibrator.sociobot.in)
 
-Live: <https://recall-calibrator.sociobot.in>
+The sample opens with three cards and eight completed reviews. It has separate
+browser storage, so resetting the demo or starting for real never changes
+ordinary local cards or reviews.
 
-## What v1 includes
+## What it does
 
-- Exact-answer and required-keyword cards with multiple accepted answers
-- Evidence-first review; the proxy is sealed until after the self-grade
-- Personal signal alignment, generous/harsh tendency, and recent trend
-- Transparent proxy-led intervals in the review result and CSV export
-- IndexedDB persistence, full JSON export/restore, and explicit local deletion
-- Installable offline PWA with a versioned app-shell cache and update prompt
-- Responsive 390 px layout, complete keyboard path, and reduced-motion mode
+- Matches typed answers with deterministic exact or required-keyword rules.
+- Accepts more than one exact answer for a card.
+- Keeps the typed result sealed until a self-grade is chosen.
+- Reports grade alignment, generous or harsh tendency, review history, and a
+  deterministic suggested interval with its rule.
+- Exports review history as CSV and restores cards and reviews from JSON.
+- Stores cards and reviews in the browser. Local data persists after reload
+  and can be deleted explicitly.
+- Works offline after the first visit and is an installable standalone PWA.
+- Supports keyboard review on a 390 px-wide screen and reduced-motion
+  preferences.
 
-All card content and review history remain in the browser. There are no
-accounts, analytics, remote fonts, third-party scripts, or runtime APIs.
+Recall Calibrator is free. It needs no account or payment. A demo review makes
+requests only to the product origin; card and review data are not sent to a
+remote store.
+
+It is a recall proxy, not a learning diagnosis. It does not replace an SRS or
+grade essays, reasoning, or long-form answers.
 
 ## Run locally
 
-Requires a current Node.js release (Node 20.19+ recommended).
+Requires Node.js 20.19 or later.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Vite prints the local development URL. Browser data is scoped to that origin.
+Browser data is scoped to the local origin. Open `/demo` to test the isolated
+sample sandbox.
 
 ## Test and build
 
 ```sh
-npm test          # deterministic matching and calibration unit tests
-npm run test:e2e # Playwright workflow, axe, mobile, and offline tests
-npm run build    # reproducible static output in dist/
+npm test
+npm run typecheck
+npm run lint
+npm run build
+npm run test:e2e
 ```
 
-The exact production build command is `npm run build`. It creates `dist/` with
-`index.html` at the root and route fallbacks for `/privacy`, `/terms`, and the
-application screens. To inspect it locally, run `npm run preview` after build.
+The build creates `dist/` with `index.html` at its root. Every public product
+claim is recorded in [`.factory/claims.json`](.factory/claims.json). Run an
+individual claim check from a clean checkout with its listed command, for
+example:
+
+```sh
+npm run test:e2e -- --grep @claim:offline-reload
+```
 
 ## Deploy
 
-Deploy the contents of `dist/` as a static site. HTTPS is required for service
-workers outside localhost. No environment variables or backend are needed.
+Deploy `dist/` as a static site. HTTPS is required for offline support outside
+localhost. The static deployment configuration supplies headers, caching,
+navigation fallback, and a styled 404 response. No environment variables,
+backend, account, or payment integration is required.
 
-The researched product contract is in [`.factory/brief.json`](.factory/brief.json),
-the risograph visual system and asset provenance are in
-[`.factory/design.md`](.factory/design.md), and verification notes are in
-[`.factory/handoff.md`](.factory/handoff.md).
+Product scope is in [`.factory/brief.json`](.factory/brief.json). The visual
+system and asset provenance are in [`.factory/design.md`](.factory/design.md).
+The demo contract is in [`.factory/demo.md`](.factory/demo.md). The current
+handoff is in [`.factory/handoff.md`](.factory/handoff.md).
 
 ## License
 
-MIT. See [`LICENSE`](LICENSE).
+MIT. See [LICENSE](LICENSE).

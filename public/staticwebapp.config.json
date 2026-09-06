@@ -1,7 +1,7 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/icons/*", "/manifest.webmanifest", "/service-worker.js", "/offline.html", "/offline.css", "/robots.txt", "/sitemap.xml"]
+    "exclude": ["/assets/*", "/icons/*", "/manifest.webmanifest", "/service-worker.js", "/offline.html", "/offline.css", "/404.html", "/404.css", "/robots.txt", "/sitemap.xml"]
   },
   "globalHeaders": {
     "Content-Security-Policy": "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: blob:; manifest-src 'self'; media-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'; upgrade-insecure-requests",
@@ -13,6 +13,12 @@
   },
   "mimeTypes": {
     ".webmanifest": "application/manifest+json"
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/404.html",
+      "statusCode": 404
+    }
   },
   "routes": [
     {

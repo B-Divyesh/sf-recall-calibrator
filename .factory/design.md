@@ -104,3 +104,7 @@ no UI screenshot.”
 - Review criteria: no text artifacts, stray anatomy, trademark-like marks,
   misleading UI, broken card edges, or palette drift. Selected source and its
   prompt sidecar are kept in `assets/src/`; optimized derivatives ship locally.
+
+The 1200 × 630 social preview at `public/assets/og-recall-calibrator.jpg` is a
+center crop of that reviewed source image, made locally on 2026-09-06. It adds
+no new subject matter or licensing claim.
