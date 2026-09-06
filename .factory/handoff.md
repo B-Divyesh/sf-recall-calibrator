@@ -6,7 +6,7 @@
 - Product: <https://recall-calibrator.sociobot.in>
 - Final implementation SHA: `d228149dab55db289c98b785e83412dec92450fc`
 - Main repair SHA: `9d9b11cb26043b4266a60f319862739f9e25fb49`
-- Documentation SHA: recorded after this handoff commit
+- Documentation handoff content SHA: `2a6e8aa099c0f3d605d2d45d9ef51251c30f2c6a`
 - Verified and deployed: 2026-09-06 UTC
 - Artifact: static local-first PWA. No backend, account, API, payment, or
   shared database is used.
