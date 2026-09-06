@@ -1,27 +1,28 @@
-# Recall Calibrator — verification handoff
+# Recall Calibrator — review handoff
 
-**Status: PASS**
+**Status: FAIL — not ready for acceptance**
 
-- Verification work order: `recall-calibrator-verify-3`
-- Tested commit: `968e7f23031f73fc56376c13bbacf9b0b16528ce`
+- Review work order: `recall-calibrator-review-1`
+- Implementation reviewed: `7d0bb748790f2f288fa3ef4d21adc9eb906ea82c`
+- Documentation tip: `1ce510be37dbba86f9de8fb2a1b276943611ffa6`
 - Live URL: <https://recall-calibrator.sociobot.in>
-- Verified: 2026-08-28 UTC
+- Reviewed: 2026-09-06 UTC
 
-Independent QA passed. The live PWA is byte-identical to the candidate’s
-public build output, works through typed recall → reveal → self-grade →
-calibration/interval → export, keeps data local in IndexedDB, and works after
-an offline reload. Exact and keyword recall, partial scoring, invalid import
-recovery, persistence, responsive keyboard use, reduced motion, worker update,
-privacy boundary, response headers, caching, and bundle budgets were checked.
+The live artifact exactly matches the clean production build (22/22 public
+files). Core recall, export, persistence, invalid-import recovery,
+accessibility, privacy request boundary, and offline reload checks pass.
 
-Fresh gates passed: `npm ci`, `npm audit --omit=dev`, `npm test` (12 tests),
+Acceptance fails with 5 findings and 18 untested public claims. The main
+blockers are the absent isolated one-click demo, missing claims registry and
+per-claim proof, and first screen that does not state the job/audience/sample
+action in plain words. Route-specific titles and a designed 404 state are also
+missing.
+
+Fresh commands passed: `npm ci`, `npm audit --omit=dev`, `npm test` (12),
 `npm run typecheck`, `npm run lint`, `npm run build`, and `npm run test:e2e`
-(6/6). Axe found zero serious/critical findings on all primary live screens and
-the dynamic review grade state. No console/page errors, failed requests, or
-third-party runtime requests were observed.
+(6/6). This static PWA has no backend/API, account, payment, or CLI/library;
+tenant isolation, restart persistence, health, 429, and consumer-install
+checks do not apply.
 
-There are no known defects or follow-up steps. This static local-first PWA has
-no backend/API, sign-in, payment, or CLI/library surface; server rate limiting,
-Entra, health, concurrency, and consumer-install checks do not apply.
-
-Full evidence and reproduction commands: [verification-3.md](verification-3.md).
+Full evidence, previous-finding disposition, and required repairs:
+[review-1.md](review-1.md).
