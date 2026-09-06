@@ -243,6 +243,48 @@ test('@claim:keyboard-mobile the full demo review works by keyboard at 390 pixel
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
 });
 
+test('keeps visible mobile targets large and the sealed label clear', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openDemo(page);
+  const undersized = await page.locator('a, button, textarea, select, input:not([type="radio"]):not([type="file"])').evaluateAll((elements) => elements.flatMap((element) => {
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    if (style.display === 'none' || style.visibility === 'hidden' || rect.width === 0 || rect.height === 0) return [];
+    return rect.width < 44 || rect.height < 44 ? [{ name: (element.textContent || element.getAttribute('aria-label') || element.tagName).trim(), width: rect.width, height: rect.height }] : [];
+  }));
+  expect(undersized).toEqual([]);
+
+  await startReview(page);
+  await revealCurrentCard(page, 'Hyper Text Transfer Protocol');
+  const label = await page.getByText('Your typed recall · result sealed').boundingBox();
+  const badge = await page.getByText('Recorded', { exact: true }).boundingBox();
+  expect(label).not.toBeNull();
+  expect(badge).not.toBeNull();
+  expect((label?.x ?? 0) + (label?.width ?? 0)).toBeLessThanOrEqual((badge?.x ?? 0) - 8);
+});
+
+test('rejects invalid card boundaries and gives a keyword recovery message', async ({ page }) => {
+  await openDemo(page);
+  await page.goto('/cards?demo=1');
+  await page.getByLabel('Question').fill('Boundary card');
+  await page.getByLabel(/Accepted answer/).fill('Boundary answer');
+  const interval = page.getByLabel(/Current interval/);
+  await interval.fill('0');
+  expect(await interval.evaluate((input) => (input as HTMLInputElement).validity.valid)).toBe(false);
+  await interval.fill('36501');
+  expect(await interval.evaluate((input) => (input as HTMLInputElement).validity.valid)).toBe(false);
+  await interval.fill('36500');
+  expect(await interval.evaluate((input) => (input as HTMLInputElement).validity.valid)).toBe(true);
+  await page.getByRole('button', { name: 'Add card' }).click();
+  await expect(page.getByText('Boundary card', { exact: true })).toBeVisible();
+
+  await page.getByLabel('Question').fill('Keyword recovery card');
+  await page.getByLabel(/Accepted answer/).fill('Keyword answer');
+  await page.locator('input[name="matchMode"][value="keywords"]').check();
+  await page.getByRole('button', { name: 'Add card' }).click();
+  await expect(page.locator('#card-error')).toHaveText('Add at least one required keyword, or choose exact answer.');
+});
+
 test('@claim:reduced-motion the demo disables visual movement when requested', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/?demo=1');

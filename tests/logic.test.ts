@@ -31,6 +31,7 @@ describe('transparent intervals and calibration', () => {
     expect(suggestedInterval(10, 0)).toBe(1);
     expect(suggestedInterval(10, 0.5)).toBe(12);
     expect(suggestedInterval(10, 1)).toBe(25);
+    expect(suggestedInterval(36_500, 1)).toBe(91_250);
   });
 
   it('reports grade bias and improvement after eight samples', () => {

@@ -213,7 +213,7 @@ footer { max-width: 1120px; margin: 0 auto; padding: 28px 32px 42px; display: fl
   .plain-facts { font-size: .88rem; }.limits { margin: 0 20px 60px; padding: 24px 20px; }.demo-banner { margin: 10px 12px 0; align-items: flex-start; flex-direction: column; gap: 8px; }.demo-banner > div { width: 100%; }.demo-banner .button, .demo-banner .text-button { flex: 1; }
   .card-layout, .insight-grid, .settings-grid { padding-left: 20px; padding-right: 20px; }.card-list li { gap: 8px; }.prompt-sheet { padding: 26px 20px; }.prompt-sheet::before, .prompt-sheet::after { display: none; }.grade-grid { grid-template-columns: repeat(2,1fr); }.registration { grid-template-columns: 1fr; max-width: 250px; }.stamp.self, .registration.aligned .stamp.self { transform: translate(8px,-8px) rotate(1deg); }.interval { grid-template-columns: 1fr; gap: 8px; }.keyboard-note { display: none; }
   .report-section { margin-left: 20px; margin-right: 20px; }.bar-report div { grid-template-columns: 70px 1fr 26px; gap: 8px; }.settings-grid .paper-panel { min-height: auto; }.toast-region { left: 14px; right: 14px; }.toast { max-width: none; }
-  footer { padding: 24px 20px calc(34px + env(safe-area-inset-bottom)); flex-direction: column; gap: 8px; } footer a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; margin: -14px 0; }
+  footer { padding: 24px 20px calc(34px + env(safe-area-inset-bottom)); flex-direction: column; gap: 8px; } footer a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 6px; margin: -14px 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
